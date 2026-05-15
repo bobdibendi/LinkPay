@@ -1,9 +1,8 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import { supabase } from '../../lib/supabase'
 import { Btn, Card } from '../../components/UI'
 import Head from 'next/head'
-import Script from 'next/script'
 
 const TIMER = 8
 
@@ -22,7 +21,6 @@ export default function LinkPage({ link }) {
         return s - 1
       })
     }, 1000)
-    // Enregistre la visite
     supabase.from('clicks').insert({ link_id: link.id, earnings: 0.004 })
     supabase.from('links').update({ visits: (link.visits || 0) + 1, earnings: (link.earnings || 0) + 0.004 }).eq('id', link.id)
     return () => clearInterval(interval)
@@ -67,49 +65,6 @@ export default function LinkPage({ link }) {
     <div style={{ minHeight: '100vh', background: 'var(--bg)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 20, padding: '40px 24px' }}>
       <Head><title>Accès au contenu — LinkPay</title></Head>
 
-      {/* Scripts publicitaires — chargés une seule fois */}
-      <Script
-        id="ad-options-300x250"
-        strategy="lazyOnload"
-        dangerouslySetInnerHTML={{
-          __html: `
-            atOptions = {
-              'key': '40ed4f97447d2c1270f9f30e826a80ac',
-              'format': 'iframe',
-              'height': 250,
-              'width': 300,
-              'params': {}
-            };
-          `
-        }}
-      />
-      <Script
-        id="ad-invoke-300x250"
-        src="https://www.highperformanceformat.com/40ed4f97447d2c1270f9f30e826a80ac/invoke.js"
-        strategy="lazyOnload"
-      />
-
-      <Script
-        id="ad-options-728x90"
-        strategy="lazyOnload"
-        dangerouslySetInnerHTML={{
-          __html: `
-            atOptions = {
-              'key': '1cc216b120ed22498a1c8c59dbcdfea2',
-              'format': 'iframe',
-              'height': 90,
-              'width': 728,
-              'params': {}
-            };
-          `
-        }}
-      />
-      <Script
-        id="ad-invoke-728x90"
-        src="https://www.highperformanceformat.com/1cc216b120ed22498a1c8c59dbcdfea2/invoke.js"
-        strategy="lazyOnload"
-      />
-
       {/* Branding mini */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
         <div style={{ width: 24, height: 24, background: 'linear-gradient(135deg, var(--accent), var(--green))', borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12 }}>⚡</div>
@@ -123,7 +78,7 @@ export default function LinkPage({ link }) {
         </div>
       </div>
 
-      {/* Zone pub 300x250 */}
+      {/* Zone pub */}
       <Card style={{ width: '100%', maxWidth: 680, minHeight: 200, position: 'relative', border: '1px solid rgba(108,99,255,.3)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         {!adLoaded ? (
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
@@ -131,12 +86,30 @@ export default function LinkPage({ link }) {
             <span style={{ color: 'var(--muted)', fontSize: 14 }}>Chargement de la publicité…</span>
           </div>
         ) : (
-          <div style={{ width: '100%', padding: '0 8px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
-            {/* Bannière 300x250 */}
-            <div style={{ width: 300, height: 250 }} id="ad-slot-300x250" />
+          <div style={{ width: '100%', padding: '16px 8px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
 
-            {/* Bannière 728x90 — masquée sur mobile */}
-            <div style={{ width: '100%', maxWidth: 728, height: 90, display: 'flex', justifyContent: 'center' }} id="ad-slot-728x90" />
+            {/* Bannière 300x250 — sandboxée, pas de redirection */}
+            <iframe
+              src="https://www.highperformanceformat.com/40ed4f97447d2c1270f9f30e826a80ac/invoke.js"
+              width="300"
+              height="250"
+              scrolling="no"
+              frameBorder="0"
+              sandbox="allow-scripts allow-same-origin allow-popups"
+              style={{ border: 'none', display: 'block', margin: '0 auto' }}
+            />
+
+            {/* Bannière 728x90 — sandboxée, pas de redirection */}
+            <iframe
+              src="https://www.highperformanceformat.com/1cc216b120ed22498a1c8c59dbcdfea2/invoke.js"
+              width="728"
+              height="90"
+              scrolling="no"
+              frameBorder="0"
+              sandbox="allow-scripts allow-same-origin allow-popups"
+              style={{ border: 'none', display: 'block', margin: '0 auto', maxWidth: '100%' }}
+            />
+
           </div>
         )}
         <div style={{ position: 'absolute', top: 10, right: 10, background: 'rgba(10,10,15,.8)', borderRadius: 6, padding: '3px 8px', fontSize: 11, color: 'var(--muted)', fontFamily: 'JetBrains Mono, monospace' }}>Pub</div>
