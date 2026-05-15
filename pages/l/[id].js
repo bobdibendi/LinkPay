@@ -3,6 +3,7 @@ import { useRouter } from 'next/router'
 import { supabase } from '../../lib/supabase'
 import { Btn, Card } from '../../components/UI'
 import Head from 'next/head'
+import Script from 'next/script'
 
 const TIMER = 8
 
@@ -66,6 +67,49 @@ export default function LinkPage({ link }) {
     <div style={{ minHeight: '100vh', background: 'var(--bg)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 20, padding: '40px 24px' }}>
       <Head><title>Accès au contenu — LinkPay</title></Head>
 
+      {/* Scripts publicitaires — chargés une seule fois */}
+      <Script
+        id="ad-options-300x250"
+        strategy="lazyOnload"
+        dangerouslySetInnerHTML={{
+          __html: `
+            atOptions = {
+              'key': '40ed4f97447d2c1270f9f30e826a80ac',
+              'format': 'iframe',
+              'height': 250,
+              'width': 300,
+              'params': {}
+            };
+          `
+        }}
+      />
+      <Script
+        id="ad-invoke-300x250"
+        src="https://www.highperformanceformat.com/40ed4f97447d2c1270f9f30e826a80ac/invoke.js"
+        strategy="lazyOnload"
+      />
+
+      <Script
+        id="ad-options-728x90"
+        strategy="lazyOnload"
+        dangerouslySetInnerHTML={{
+          __html: `
+            atOptions = {
+              'key': '1cc216b120ed22498a1c8c59dbcdfea2',
+              'format': 'iframe',
+              'height': 90,
+              'width': 728,
+              'params': {}
+            };
+          `
+        }}
+      />
+      <Script
+        id="ad-invoke-728x90"
+        src="https://www.highperformanceformat.com/1cc216b120ed22498a1c8c59dbcdfea2/invoke.js"
+        strategy="lazyOnload"
+      />
+
       {/* Branding mini */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
         <div style={{ width: 24, height: 24, background: 'linear-gradient(135deg, var(--accent), var(--green))', borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12 }}>⚡</div>
@@ -79,7 +123,7 @@ export default function LinkPage({ link }) {
         </div>
       </div>
 
-      {/* Zone pub */}
+      {/* Zone pub 300x250 */}
       <Card style={{ width: '100%', maxWidth: 680, minHeight: 200, position: 'relative', border: '1px solid rgba(108,99,255,.3)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         {!adLoaded ? (
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
@@ -87,27 +131,12 @@ export default function LinkPage({ link }) {
             <span style={{ color: 'var(--muted)', fontSize: 14 }}>Chargement de la publicité…</span>
           </div>
         ) : (
-          <div style={{ width: '100%', padding: '0 8px' }}>
-            {/* 
-              ══════════════════════════════════════════════════
-              REMPLACE CE BLOC PAR TON CODE PUBLICITAIRE RÉEL
-              Ex: Google AdSense, Adsterra, PropellerAds...
-              
-              Pour AdSense:
-              <ins className="adsbygoogle"
-                style={{ display: 'block' }}
-                data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
-                data-ad-slot="XXXXXXXXXX"
-                data-ad-format="auto" />
-              ══════════════════════════════════════════════════
-            */}
-            <div style={{ background: 'linear-gradient(135deg, #1a1a2e, #16213e)', borderRadius: 12, padding: '32px 24px', textAlign: 'center', border: '1px solid var(--border)' }}>
-              <div style={{ color: 'var(--muted)', fontSize: 11, textTransform: 'uppercase', letterSpacing: 2, marginBottom: 12 }}>Publicité</div>
-              <div style={{ fontSize: 40, marginBottom: 12 }}>🎮</div>
-              <div style={{ fontWeight: 700, fontSize: 20, marginBottom: 6 }}>Jeu Gratuit — Joue maintenant !</div>
-              <div style={{ color: 'var(--muted)', fontSize: 14, marginBottom: 16 }}>Des milliers de joueurs t'attendent.</div>
-              <span style={{ background: 'linear-gradient(135deg, var(--accent), var(--accent-light))', color: '#fff', padding: '10px 24px', borderRadius: 8, fontSize: 14, fontWeight: 600 }}>Essayer gratuitement →</span>
-            </div>
+          <div style={{ width: '100%', padding: '0 8px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
+            {/* Bannière 300x250 */}
+            <div style={{ width: 300, height: 250 }} id="ad-slot-300x250" />
+
+            {/* Bannière 728x90 — masquée sur mobile */}
+            <div style={{ width: '100%', maxWidth: 728, height: 90, display: 'flex', justifyContent: 'center' }} id="ad-slot-728x90" />
           </div>
         )}
         <div style={{ position: 'absolute', top: 10, right: 10, background: 'rgba(10,10,15,.8)', borderRadius: 6, padding: '3px 8px', fontSize: 11, color: 'var(--muted)', fontFamily: 'JetBrains Mono, monospace' }}>Pub</div>
