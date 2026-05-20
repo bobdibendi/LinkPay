@@ -44,15 +44,7 @@ export default function LinkPage({ link }) {
       container300.appendChild(iframe)
     }
 
-    // PUB 2 : NativeBanner Adsterra
-    const nativeContainer = document.getElementById('container-e089769e68287963e9b596633209f173')
-    if (nativeContainer) {
-      const s = document.createElement('script')
-      s.async = true
-      s.setAttribute('data-cfasync', 'false')
-      s.src = 'https://pl29457785.effectivecpmnetwork.com/e089769e68287963e9b596633209f173/invoke.js'
-      nativeContainer.appendChild(s)
-    }
+
 
 
 
@@ -133,7 +125,6 @@ export default function LinkPage({ link }) {
         ) : (
           <div style={{ width: '100%', padding: '16px 8px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20 }}>
             <div id="ad-300x250" style={{ width: 300, height: 250 }} />
-            <div id="container-e089769e68287963e9b596633209f173" style={{ width: '100%', maxWidth: 660 }} />
           </div>
         )}
         <div style={{ position: 'absolute', top: 10, right: 10, background: 'rgba(10,10,15,.8)', borderRadius: 6, padding: '3px 8px', fontSize: 11, color: 'var(--muted)', fontFamily: 'JetBrains Mono, monospace' }}>Pub</div>
