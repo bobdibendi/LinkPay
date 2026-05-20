@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/router'
 import { supabase } from '../../lib/supabase'
 import { Btn, Card } from '../../components/UI'
@@ -6,11 +6,52 @@ import Head from 'next/head'
 
 const TIMER = 8
 
+// Charge un script externe dynamiquement et retourne une Promise
+function loadScript(src) {
+  return new Promise((resolve, reject) => {
+    const existing = document.querySelector(`script[src="${src}"]`)
+    if (existing) { resolve(); return }
+    const s = document.createElement('script')
+    s.src = src
+    s.async = true
+    s.onload = resolve
+    s.onerror = reject
+    document.body.appendChild(s)
+  })
+}
+
 export default function LinkPage({ link }) {
   const [seconds, setSeconds] = useState(TIMER)
   const [phase, setPhase] = useState('ad') // ad | unlocked
   const [adLoaded, setAdLoaded] = useState(false)
   const router = useRouter()
+  const adsInjected = useRef(false)
+
+  // Injecte les pubs une fois que la zone est visible
+  useEffect(() => {
+    if (!adLoaded || adsInjected.current) return
+    adsInjected.current = true
+
+    // --- PUB 1 : 300x250 HighPerformanceFormat ---
+    window.atOptions = {
+      key: '40ed4f97447d2c1270f9f30e826a80ac',
+      format: 'iframe',
+      height: 250,
+      width: 300,
+      params: {}
+    }
+    loadScript('https://www.highperformanceformat.com/40ed4f97447d2c1270f9f30e826a80ac/invoke.js')
+      .catch(() => {}) // silencieux si bloqué par adblock
+
+    // --- PUB 2 : NativeBanner Adsterra ---
+    loadScript('https://pl29457785.effectivecpmnetwork.com/e089769e68287963e9b596633209f173/invoke.js')
+      .catch(() => {})
+
+    // --- PUB 3 : SocialBar Adsterra ---
+    loadScript('https://pl29457786.effectivecpmnetwork.com/cb/7c/46/cb7c46fe357f6245dc77c3cbf2d7767a.js')
+      .catch(() => {})
+
+  }, [adLoaded])
 
   useEffect(() => {
     if (!link) return
@@ -79,35 +120,25 @@ export default function LinkPage({ link }) {
       </div>
 
       {/* Zone pub */}
-      <Card style={{ width: '100%', maxWidth: 680, minHeight: 200, position: 'relative', border: '1px solid rgba(108,99,255,.3)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <Card style={{ width: '100%', maxWidth: 680, minHeight: 280, position: 'relative', border: '1px solid rgba(108,99,255,.3)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         {!adLoaded ? (
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
             <div style={{ width: 32, height: 32, border: '3px solid var(--border)', borderTopColor: 'var(--accent)', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
             <span style={{ color: 'var(--muted)', fontSize: 14 }}>Chargement de la publicité…</span>
           </div>
         ) : (
-          <div style={{ width: '100%', padding: '16px 8px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
+          <div style={{ width: '100%', padding: '16px 8px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20 }}>
 
-            {/* Bannière 300x250 — sandboxée, pas de redirection */}
-            <iframe
-              src="https://www.highperformanceformat.com/40ed4f97447d2c1270f9f30e826a80ac/invoke.js"
-              width="300"
-              height="250"
-              scrolling="no"
-              frameBorder="0"
-              sandbox="allow-scripts allow-same-origin allow-popups"
-              style={{ border: 'none', display: 'block', margin: '0 auto' }}
+            {/* Pub 300x250 — le script invoke.js injecte la pub directement ici */}
+            <div
+              id="ad-300x250"
+              style={{ width: 300, height: 250, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
             />
 
-            {/* Bannière 728x90 — sandboxée, pas de redirection */}
-            <iframe
-              src="https://www.highperformanceformat.com/1cc216b120ed22498a1c8c59dbcdfea2/invoke.js"
-              width="728"
-              height="90"
-              scrolling="no"
-              frameBorder="0"
-              sandbox="allow-scripts allow-same-origin allow-popups"
-              style={{ border: 'none', display: 'block', margin: '0 auto', maxWidth: '100%' }}
+            {/* NativeBanner Adsterra — injecte dans ce div via son invoke.js */}
+            <div
+              id="container-e089769e68287963e9b596633209f173"
+              style={{ width: '100%', maxWidth: 660 }}
             />
 
           </div>
