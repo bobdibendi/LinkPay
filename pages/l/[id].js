@@ -54,10 +54,7 @@ export default function LinkPage({ link }) {
       nativeContainer.appendChild(s)
     }
 
-    // PUB 3 : SocialBar
-    const s3 = document.createElement('script')
-    s3.src = 'https://pl29457786.effectivecpmnetwork.com/cb/7c/46/cb7c46fe357f6245dc77c3cbf2d7767a.js'
-    document.body.appendChild(s3)
+
 
   }, [adLoaded])
 
