@@ -6,50 +6,58 @@ import Head from 'next/head'
 
 const TIMER = 8
 
-// Charge un script externe dynamiquement et retourne une Promise
-function loadScript(src) {
-  return new Promise((resolve, reject) => {
-    const existing = document.querySelector(`script[src="${src}"]`)
-    if (existing) { resolve(); return }
-    const s = document.createElement('script')
-    s.src = src
-    s.async = true
-    s.onload = resolve
-    s.onerror = reject
-    document.body.appendChild(s)
-  })
-}
-
 export default function LinkPage({ link }) {
   const [seconds, setSeconds] = useState(TIMER)
-  const [phase, setPhase] = useState('ad') // ad | unlocked
+  const [phase, setPhase] = useState('ad')
   const [adLoaded, setAdLoaded] = useState(false)
   const router = useRouter()
   const adsInjected = useRef(false)
 
-  // Injecte les pubs une fois que la zone est visible
   useEffect(() => {
     if (!adLoaded || adsInjected.current) return
     adsInjected.current = true
 
-    // --- PUB 1 : 300x250 HighPerformanceFormat ---
-    window.atOptions = {
-      key: '40ed4f97447d2c1270f9f30e826a80ac',
-      format: 'iframe',
-      height: 250,
-      width: 300,
-      params: {}
+    // PUB 1 : 300x250 iframe — inject dans #ad-300x250
+    const container300 = document.getElementById('ad-300x250')
+    if (container300) {
+      const iframe = document.createElement('iframe')
+      iframe.src = `https://www.highperformanceformat.com/40ed4f97447d2c1270f9f30e826a80ac/invoke.js`
+      iframe.width = 300
+      iframe.height = 250
+      iframe.frameBorder = '0'
+      iframe.scrolling = 'no'
+      // On passe par un script inline dans un iframe srcdoc
+      const html = `<!DOCTYPE html><html><head></head><body style="margin:0">
+        <script>
+          atOptions = {
+            key: '40ed4f97447d2c1270f9f30e826a80ac',
+            format: 'iframe',
+            height: 250,
+            width: 300,
+            params: {}
+          };
+        <\/script>
+        <script src="https://www.highperformanceformat.com/40ed4f97447d2c1270f9f30e826a80ac/invoke.js"><\/script>
+      </body></html>`
+      const blob = new Blob([html], { type: 'text/html' })
+      iframe.src = URL.createObjectURL(blob)
+      container300.appendChild(iframe)
     }
-    loadScript('https://www.highperformanceformat.com/40ed4f97447d2c1270f9f30e826a80ac/invoke.js')
-      .catch(() => {}) // silencieux si bloqué par adblock
 
-    // --- PUB 2 : NativeBanner Adsterra ---
-    loadScript('https://pl29457785.effectivecpmnetwork.com/e089769e68287963e9b596633209f173/invoke.js')
-      .catch(() => {})
+    // PUB 2 : NativeBanner Adsterra
+    const nativeContainer = document.getElementById('container-e089769e68287963e9b596633209f173')
+    if (nativeContainer) {
+      const s = document.createElement('script')
+      s.async = true
+      s.setAttribute('data-cfasync', 'false')
+      s.src = 'https://pl29457785.effectivecpmnetwork.com/e089769e68287963e9b596633209f173/invoke.js'
+      nativeContainer.appendChild(s)
+    }
 
-    // --- PUB 3 : SocialBar Adsterra ---
-    loadScript('https://pl29457786.effectivecpmnetwork.com/cb/7c/46/cb7c46fe357f6245dc77c3cbf2d7767a.js')
-      .catch(() => {})
+    // PUB 3 : SocialBar
+    const s3 = document.createElement('script')
+    s3.src = 'https://pl29457786.effectivecpmnetwork.com/cb/7c/46/cb7c46fe357f6245dc77c3cbf2d7767a.js'
+    document.body.appendChild(s3)
 
   }, [adLoaded])
 
@@ -75,7 +83,7 @@ export default function LinkPage({ link }) {
 
   if (!link) return (
     <div style={{ minHeight: '100vh', background: 'var(--bg)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 16, padding: 24 }}>
-      <div style={{ fontSize: 48 }}>🔍</div>
+      <div style={{ fontSize: 48 }}>🔗</div>
       <h2 style={{ fontSize: 22, fontWeight: 700 }}>Lien introuvable</h2>
       <p style={{ color: 'var(--muted)', fontSize: 14 }}>Ce lien n'existe pas ou a été supprimé.</p>
       <Btn href="/">Retour à l'accueil</Btn>
@@ -87,7 +95,7 @@ export default function LinkPage({ link }) {
   if (phase === 'unlocked') return (
     <div style={{ minHeight: '100vh', background: 'var(--bg)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 24, padding: 24 }}>
       <Head><title>Lien déverrouillé — LinkPay</title></Head>
-      <div style={{ width: 80, height: 80, borderRadius: '50%', background: 'linear-gradient(135deg, var(--green), #00f5c0)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 36, boxShadow: '0 0 40px var(--green-glow)', animation: 'pop .4s ease' }}>✓</div>
+      <div style={{ width: 80, height: 80, borderRadius: '50%', background: 'linear-gradient(135deg, var(--green), #00f5c0)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 36, boxShadow: '0 0 40px var(--green-glow)', animation: 'pop .4s ease' }}>✔</div>
       <div style={{ textAlign: 'center' }}>
         <h2 style={{ fontSize: 26, fontWeight: 700, marginBottom: 8 }}>Lien déverrouillé !</h2>
         <p style={{ color: 'var(--muted)', fontSize: 15 }}>Tu vas être redirigé vers le contenu.</p>
@@ -106,7 +114,6 @@ export default function LinkPage({ link }) {
     <div style={{ minHeight: '100vh', background: 'var(--bg)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 20, padding: '40px 24px' }}>
       <Head><title>Accès au contenu — LinkPay</title></Head>
 
-      {/* Branding mini */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
         <div style={{ width: 24, height: 24, background: 'linear-gradient(135deg, var(--accent), var(--green))', borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12 }}>⚡</div>
         <span style={{ color: 'var(--muted)', fontSize: 13, fontWeight: 600 }}>LinkPay</span>
@@ -128,19 +135,8 @@ export default function LinkPage({ link }) {
           </div>
         ) : (
           <div style={{ width: '100%', padding: '16px 8px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20 }}>
-
-            {/* Pub 300x250 — le script invoke.js injecte la pub directement ici */}
-            <div
-              id="ad-300x250"
-              style={{ width: 300, height: 250, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-            />
-
-            {/* NativeBanner Adsterra — injecte dans ce div via son invoke.js */}
-            <div
-              id="container-e089769e68287963e9b596633209f173"
-              style={{ width: '100%', maxWidth: 660 }}
-            />
-
+            <div id="ad-300x250" style={{ width: 300, height: 250 }} />
+            <div id="container-e089769e68287963e9b596633209f173" style={{ width: '100%', maxWidth: 660 }} />
           </div>
         )}
         <div style={{ position: 'absolute', top: 10, right: 10, background: 'rgba(10,10,15,.8)', borderRadius: 6, padding: '3px 8px', fontSize: 11, color: 'var(--muted)', fontFamily: 'JetBrains Mono, monospace' }}>Pub</div>
